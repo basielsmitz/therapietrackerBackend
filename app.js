@@ -1,4 +1,5 @@
 const express = require('express');
+require('dotenv').config();
 const bodyParser = require('body-parser');
 const sequelize = require('./util/database');
 const aFE = require('./util/asyncForEach');
@@ -56,6 +57,9 @@ app.use( (req, res, next) => {
   });
 
 //routes
+app.use('/', (req, res, next) => {
+    res.send('<marquee>server is running</marquee>')
+})
 app.use('/auth', authRoutes);
 app.use('/client', clientRoutes);
 app.use('/psy', psyRoutes);
@@ -117,11 +121,6 @@ Todo.belongsTo(Psy);
 User.hasOne(Contact);
 Contact.belongsTo(User);
 
-app.use((req, res, next) => {
-    res.render('running');
-    next();
-})
-
 //errorhandler
 app.use((error, req, res, next) => {
     console.log(error)
@@ -130,8 +129,10 @@ app.use((error, req, res, next) => {
     res.status(status).json({message: message, errors: error});
 })
 
+
+
 //connection
-//sequelize.sync({ force: true })
+// sequelize.sync({ force: true })
 sequelize.sync()
 .then(result => {
     startingData();
