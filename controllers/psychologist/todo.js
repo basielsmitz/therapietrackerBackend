@@ -1,12 +1,8 @@
 const Psy = require('../../models/psychologist');
 const ToDo = require('../../models/todo')
 
-exports.test = async (req, res, next) => {
-    console.log('works');
-}
 exports.addToDo = async (req, res, next) => {
     try {
-        console.log('works');
         const psy = await Psy.findByPk(req.role.id);
         const entry = await psy.createTodo({
             name: req.body.name,
@@ -29,13 +25,13 @@ exports.addToDo = async (req, res, next) => {
 }
 exports.getAllTodos = async (req, res, next) => {
     try {
-        console.log('works');
         const psy = await Psy.findByPk(req.role.id);
         const todos = await psy.getTodos();
         if (todos.length <= 0) {
-            const error = new Error('No ToDo\'s found');
-            error.statusCode = 401;
-            throw error;
+            res.status(204).json({
+                message: 'No ToDo\'s found',
+                data: []
+            });  
         } 
         res.status(201).json({ data: todos});
     } catch (err) {

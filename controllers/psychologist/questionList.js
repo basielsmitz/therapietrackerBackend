@@ -45,9 +45,10 @@ exports.getQuestionLists = async (req, res, next) => {
         });
 
         if(questionLists.length <= 0){
-            const error = new Error('No question lists found');
-            error.statusCode = 401;
-            throw error;
+            res.status(204).json({
+                message: 'You don\'t have any questionlists yet',
+                data: []
+            });  
         }
 
     res.status(201).json({ data: {

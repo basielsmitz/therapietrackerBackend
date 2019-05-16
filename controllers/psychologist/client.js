@@ -54,9 +54,10 @@ exports.getClients = async (req, res, next) => {
         })
         
         if(clients.length <= 0){
-            const error = new Error('You don\'t have any clients yet');
-            error.statusCode = 404;
-            throw error;
+            res.status(204).json({
+                message: 'You don\'t have any clients yet',
+                data: []
+            });  
         }
         const clientsPlus = [];
         await aFE.asyncForEach(clients, async (client) => {
@@ -90,10 +91,8 @@ exports.getClients = async (req, res, next) => {
 
             });
             if(lastAnsweredAnswer.length <= 0) {
-                console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!true');
                 clientsPlus.push(client);
             } else {
-                console.log('ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffalse');
                 console.log(lastAnsweredAnswer);
 
             const session = await Session.findOne({
@@ -110,7 +109,6 @@ exports.getClients = async (req, res, next) => {
                 },
                 order: [ [ 'createdAt', 'DESC' ]]
             });
-            console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
             //console.log(questionList);
             const question = await Question.findOne({
                 where: {
@@ -118,7 +116,6 @@ exports.getClients = async (req, res, next) => {
                     question: 'Algemene Beoordeeling'
                 },
             });
-            console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
             //console.log(question);
             //console.log(session[0].id);
             const answer = await Answer.findOne({
@@ -127,7 +124,6 @@ exports.getClients = async (req, res, next) => {
                     evaluationQuestionId: question.id
                 }
             });
-            console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
             //console.log(answer);
             if(answer) {
                 client.score = answer.value;
@@ -497,13 +493,6 @@ exports.updateClient = async (req, res, next) => {
 exports.getClientContact = async (req, res, next) => {
     try {
         const psy = await Psy.findByPk(req.role.id); 
-        console.log('logggggggggggginglogggggggggggginglogggggggggggginglogggggggggggging');
-        console.log('logggggggggggginglogggggggggggginglogggggggggggginglogggggggggggging');
-        console.log('logggggggggggginglogggggggggggginglogggggggggggginglogggggggggggging');
-        console.log('logggggggggggginglogggggggggggginglogggggggggggginglogggggggggggging');
-        console.log('logggggggggggginglogggggggggggginglogggggggggggginglogggggggggggging');
-        console.log('logggggggggggginglogggggggggggginglogggggggggggginglogggggggggggging');
-        console.log('logggggggggggginglogggggggggggginglogggggggggggginglogggggggggggging');
         const client = await psy.getClients({
             where: {
                 id: req.params.clientId
