@@ -57,13 +57,13 @@ app.use( (req, res, next) => {
   });
 
 //routes
-app.use('/', (req, res, next) => {
-    res.send('<marquee>server is running</marquee>')
-})
+
 app.use('/auth', authRoutes);
 app.use('/client', clientRoutes);
 app.use('/psy', psyRoutes);
-
+app.use('/', (req, res, next) => {
+    res.send('<marquee>server is running</marquee>')
+})
 //relationships
 Client.belongsTo(User);
 User.hasOne(Client);
