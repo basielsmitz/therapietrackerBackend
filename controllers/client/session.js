@@ -19,9 +19,10 @@ exports.getSessions = async (req, res, next) => {
             raw: true,
         });
         if(sessions.length <= 0){
-            const error = new Error('There are no sessions');
-            error.statusCode = 401;
-            throw error;
+            res.status(204).json({
+                message: 'There are no sessions yet',
+                data: []
+            });  
         }
         const answers = await EvaluationAnswer.findAll();
         console.log(answers);
@@ -73,13 +74,15 @@ exports.getSession = async (req, res, next) => {
         //TODO: add all evaluationscores
 
         const session = await Session.findByPk(req.params.sessionId);
-        const questionLists = await session.getQuestionLists();
+        const questionLists = await session.getQuestionLists({
+            order: [['createdAt', 'ASC']]
+        });
         const allQuestions = [];
         const answers = [];
 
         if(!session){
             const error = new Error('No session with id :' + req.params.sessionId + ' was found!');
-            error.statusCode = 401;
+            error.statusCode = 404;
             throw error;
         }
         // get all questions
@@ -91,16 +94,19 @@ exports.getSession = async (req, res, next) => {
                 raw: true
             });
             allQuestions.push(...questions);
-
         });
         // TODO check questions for answers
         await aFE.asyncForEach(allQuestions, async (question) => {
+            console.log(session);
             const answer = await EvaluationAnswer.findOne({
                 where: {
                     evaluationQuestionId: question.id,
                     sessionId: session.id,
                 }
             });
+            console.log('answer??????????????????????????????????????????????????');
+            console.log(answer);
+
             if(answer) {
                 answers.push(answer);
             }
@@ -135,7 +141,6 @@ exports.evaluateSession = async (req, res, next) => {
                 }
             });
             if(dbAnswer){
-                
                 messages.push(
                     {
                         message: 'question with id: ' + dbAnswer.evaluationQuestionId + ' has already been answered',
@@ -143,16 +148,16 @@ exports.evaluateSession = async (req, res, next) => {
                     }
                 );
             } else {
-                const question = await EvaluationQuestion.findByPk(answer.questionId);
+                const question = await EvaluationQuestion.findByPk(answer.id);
                 if(question) {
                     questions.push(question); 
                     const newAnswer = await client.createEvaluationAnswer({
                         value: answer.value
                     });
-                    await newAnswer.setEvaluationQuestion(answer.questionId);
+                    await newAnswer.setEvaluationQuestion(question.id);
                     await newAnswer.setSession(req.params.sessionId);
-                    console.log(newAnswer);
                     answers.push(newAnswer);
+                    
                 }
                 else {
                     messages.push(
@@ -160,14 +165,19 @@ exports.evaluateSession = async (req, res, next) => {
                             message: 'question with id: ' + answer.questionId + ' has not been found',
                         }
                     );
+
                 }
+                if (answer === req.body.answers[req.body.answers.length - 1]) {
+                    res.status(200).json({
+                        questions: questions,
+                        answers: answers,
+                        messages: messages
+                    });
+                }
+                
             }
         });
-        res.status(200).json({
-            questions: questions,
-            answers: answers,
-            messages: messages
-        });
+        
         
     } catch (err) {
         if (!err.statusCode) {

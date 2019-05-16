@@ -139,51 +139,136 @@ sequelize.sync()
 const startingData = async () => {
     const emotions = [
         {
-            title: 'test',
-            description: 'test'
+            title: 'Boos',
+            description: 'Boos'
         },
         {
-            title: 'test2',
-            description: 'test2'
+            title: 'Opgelaten',
+            description: 'Opgelaten'
         },
+        {
+            title: 'Geërgerd',
+            description: 'Geërgerd'
+        },
+        {
+            title: 'Gespannen',
+            description: 'Gespannen'
+        },
+        {
+            title: 'Verlangend',
+            description: 'Verlangend'
+        },
+        {
+            title: 'Kwetsbaar',
+            description: 'Kwetsbaar'
+        },
+        {
+            title: 'Afwezig',
+            description: 'Afwezig'
+        },
+        {
+            title: 'Bang',
+            description: 'Bang'
+        },
+        {
+            title: 'Onrustig',
+            description: 'Onrustig'
+        },
+        {
+            title: 'Pijn',
+            description: 'Pijn'
+        },
+        {
+            title: 'Treurig',
+            description: 'Treurig'
+        },
+        {
+            title: 'Afkeer',
+            description: 'Afkeer'
+        },
+        {
+            title: 'Verdriet',
+            description: 'Verdriet'
+        },
+        {
+            title: 'Vermoeid',
+            description: 'Vermoeid'
+        },
+        {
+            title: 'Verward',
+            description: 'Verward'
+        }
     ]
     const moodQuestions = [
         {
-            question: 'test', 
-            description: 'test', 
+            question: 'Voelt u zich hopeloos?', 
+            description: '/', 
             type: 'ja/nee'
         },
         {
-            question: 'test2', 
+            question: 'Voelt u zich kalm?', 
             description: 'test2', 
             type: 'ja/nee'
+        },
+        {
+            question: 'Waar verlang je naar?', 
+            description: '/', 
+            type: 'text'
+        },
+        {
+            question: 'Kies een kleur', 
+            description: 'test2', 
+            type: 'select',
+            data: JSON.stringify({
+                options: [
+                    'Rood',
+                    'Blauw',
+                    'Groen',
+                    'Geel',
+                ]
+            })
+        },
+        {
+            question: 'Kan u zich concentreren?', 
+            description: '/', 
+            type: 'ja/nee'
+        },
+        {
+            question: 'Je bent productief bezig', 
+            description: '/', 
+            type: 'range',
+            data: JSON.stringify({
+                value: '5',
+                labelMin: 'Niet akkoord',
+                labelMax: 'Akkoord'
+            })
         }
     ]
-        // //add emotions to db
-        // await aFE.asyncForEach(emotions, async (emotion) => {
-        //     const dbEmotion = await Emotion.findOne({
-        //         where: emotion
-        //     });
-        //     if(!dbEmotion) {
-        //         await Emotion.create(emotion);
-        //     } else {
-        //         console.log('emotionExists');
-        //     }
-        // })
+        //add emotions to db
+        await aFE.asyncForEach(emotions, async (emotion) => {
+            const dbEmotion = await Emotion.findOne({
+                where: emotion
+            });
+            if(!dbEmotion) {
+                await Emotion.create(emotion);
+            } else {
+                console.log('emotionExists');
+            }
+        })
     
-        // //add questions to db
-        // await aFE.asyncForEach(moodQuestions, async (question) => {
-        //     await MoodQuestion.create(question);
-        // })
-        // await aFE.asyncForEach(moodQuestions, async (question) => {
-        //     const dbQuestion = await MoodQuestion.findOne({
-        //         where: question
-        //     });
-        //     console.log('ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddbquestion')
-        //     if(!dbQuestion) {
-        //         await MoodQuestion.create(question);
-        //     } else {
-        //         console.log('questionExists');
-        //     }
-        // })
+        //add questions to db
+        await aFE.asyncForEach(moodQuestions, async (question) => {
+            await MoodQuestion.create(question);
+        })
+        await aFE.asyncForEach(moodQuestions, async (question) => {
+            const dbQuestion = await MoodQuestion.findOne({
+                where: question
+            });
+            console.log('ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddbquestion')
+            if(!dbQuestion) {
+                await MoodQuestion.create(question);
+            } else {
+                console.log('questionExists');
+            }
+        })
 }

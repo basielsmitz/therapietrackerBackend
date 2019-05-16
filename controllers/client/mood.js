@@ -47,7 +47,8 @@ exports.addMood = async (req, res, next) => {
             }
             const moodEmotions =[]
             await asyncForEach(allEmotionIds, async (emotion) => {
-
+                console.log('hellloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo');
+                console.log(emotion);
                 const moodEmotion = await Emotion.findByPk(emotion.id);
                 if(moodEmotion) {
                     await entry.addEmotion(moodEmotion);
@@ -62,7 +63,7 @@ exports.addMood = async (req, res, next) => {
                         await emotion.emotionEntry.destroy({force: true});
                     })
                     await entry.destroy();
-                    const error = new Error('A mood with id: '+ emotion.id +' could not be found');
+                    const error = new Error('An emotion with id: '+ emotion.id +' could not be found');
                     error.statusCode = 401;
                     throw error;
                 }
@@ -96,9 +97,10 @@ exports.getMoods = async (req, res, next ) => {
         if(entries.length > 0){
             res.status(201).json({data: {entries: entries}});
         } else {
-            const error = new Error('No moods found');
-            error.statusCode = 401;
-            throw error;
+            res.status(204).json({
+                message: 'There are no moods yet',
+                data: []
+            });  
         }
     } catch (err) {
         if (!err.statusCode) {
@@ -113,12 +115,12 @@ exports.getMoodData = async (req, res, next ) => {
         const questions = await MoodQuestion.findAll();
         if(emotions.length <= 0){
             const error = new Error('No emotions found');
-            error.statusCode = 401;
+            error.statusCode = 404;
             throw error;
         }
         if(questions.length <= 0){
             const error = new Error('No questions found');
-            error.statusCode = 401;
+            error.statusCode = 404;
             throw error;
         }
         res.status(201).json({data: {
@@ -156,7 +158,9 @@ exports.getMood = async (req, res, next ) => {
                     $lt: endDate,
                     $gt: startDate
                 }
-            }
+            },
+            order: [['createdAt', 'DESC']],
+
         })
         if (entries.length > 0) {
             const allEntries  = [];

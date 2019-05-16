@@ -21,6 +21,13 @@ const MoodQuestion = sequelize.define('moodQuestion', {
   type: {
     type: Sequelize.STRING,
     allowNull: false,
+    validate: {
+      isIn: [['ja/nee', 'range', 'select', 'text']],
+    }
+  },
+  data: {
+    type: Sequelize.TEXT,
+    allowNull: true,
   },
 
 })

@@ -26,7 +26,7 @@ const EvaluationQuestion = sequelize.define('evaluationQuestion', {
     }
   },
   data: {
-    type: Sequelize.JSON,
+    type: Sequelize.TEXT,
     allowNull: true,
   },
 })

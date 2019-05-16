@@ -11,22 +11,42 @@ const createStartData = async (psy, next) => {
                 {
                     question: 'Algemene Beoordeeling', 
                     description: 'Beoordeeling die de gehele sessie omvat', 
-                    type: 'range'
+                    type: 'range',
+                    data: JSON.stringify({
+                        value: 5,
+                        labelMin: 'Zeer slecht',
+                        labelMax: 'Zeer goed'
+                    }),
                 },
                 {
                     question: 'Ik werd gehoord, verstaan en gerespecteerd', 
                     description: 'relatie tussen client/psycholoog', 
                     type: 'range',
+                    data: JSON.stringify({
+                        value: 5,
+                        labelMin: 'Niet akkoord',
+                        labelMax: 'Akkoord'
+                    }),
                 },
                 {
                     question: 'De topics die ik wou bespreken werden aangehaald', 
                     description: 'topics', 
                     type: 'range',
+                    data: JSON.stringify({
+                        value: 5,
+                        labelMin: 'Niet akkoord',
+                        labelMax: 'Akkoord'
+                    }),
                 },
                 {
                     question: 'De aanpak van de psycholoog past bij mij', 
                     description: 'aanpak', 
                     type: 'range',
+                    data: JSON.stringify({
+                        value: 5,
+                        labelMin: 'Niet akkoord',
+                        labelMax: 'Akkoord'
+                    }),
                 },
             ]}
         ]
@@ -53,11 +73,7 @@ module.exports = createStartData;
     const questions = [];
 
     await aFE.asyncForEach(entry.questions, async (question) => {
-        const newQuestion = await Question.create({
-            question: question.question,
-            description: question.description,
-            type: question.type,
-        })
+        const newQuestion = await Question.create(question)
         questions.push(newQuestion);
         await newQuestion.setQuestionList(questionList);
     });

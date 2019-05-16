@@ -125,6 +125,7 @@ router.post('/client',
 router.get('/client', isPsy, clientController.getClients);
 router.get('/client/:clientId', isPsy, clientController.getClient);
 router.put('/client/:clientId', isPsy, clientController.updateClient);
+router.get('/client/:clientId/contact', isPsy, clientController.getClientContact);
 router.get('/client/:clientId/goal', isPsy, clientController.getClientGoals);
 router.get('/client/:clientId/session', isPsy, clientController.getClientSessions);
 router.get('/client/:clientId/session/:sessionId', isPsy, clientController.getClientSession);

@@ -1,22 +1,8 @@
-Skip to content
- 
-Search or jump to…
 
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@gdm-1819-basismit 
-2,770
-83,838 40,814 github/gitignore
- Code  Pull requests 75  Projects 0  Insights
-gitignore/Node.gitignore
-@byeonggukgong byeonggukgong Update Node.gitignore (#2934)
-e58b3e0 4 days ago
-@stuartpb @shiftkey @TennyZhuang @venatoria @ro31337 @melonmanchan @gouthamve @jucrouzet @cheddar @arcresu @kesoji @tejashah88 @sroberts @SimonSiefke @segayuu @Richienb @rgbkrk @rsolomo @peat @noinkling @ndelvalle @MikeRalphson @lmedson @shtr0m @kerimdzhanov @joreyaesh
-89 lines (63 sloc)  1.28 KB
-    
+# Created by https://www.gitignore.io/api/node
+# Edit at https://www.gitignore.io/?templates=node
+
+### Node ###
 # Logs
 logs
 *.log
@@ -39,7 +25,6 @@ lib-cov
 
 # Coverage directory used by tools like istanbul
 coverage
-*.lcov
 
 # nyc test coverage
 .nyc_output
@@ -62,9 +47,6 @@ jspm_packages/
 
 # TypeScript v1 declaration files
 typings/
-
-# TypeScript cache
-*.tsbuildinfo
 
 # Optional npm cache directory
 .npm
@@ -105,15 +87,5 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
-© 2019 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Help
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
+
+# End of https://www.gitignore.io/api/node

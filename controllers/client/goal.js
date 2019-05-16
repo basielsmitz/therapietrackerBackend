@@ -27,9 +27,10 @@ exports.getGoals = async (req, res, next) => {
         const client = await Client.findByPk(req.role.id);
         const goals = await client.getGoals();
         if (goals.length <= 0) {
-            const error = new Error('There are no goals');
-            error.statusCode = 401;
-            throw error;
+            res.status(204).json({
+                message: 'There are no goals yet',
+                data: []
+            });  
         }
         res.status(200).json({data: goals});
 
@@ -45,7 +46,7 @@ exports.getGoal = async (req, res, next) => {
         const goal = await Goal.findByPk(req.params.goalId);
         if(!goal) {
             const error = new Error('There are no goal with id: ' + req.params.goalId);
-            error.statusCode = 401;
+            error.statusCode = 404;
             throw error;
         }
         res.status(201).json({data: goal});
@@ -62,7 +63,7 @@ exports.goalStatusChange = async (req, res, next) => {
        const goal = await Goal.findByPk(req.params.goalId);
         if(!goal) {
             const error = new Error('There are no goal with id: ' + req.params.goalId);
-            error.statusCode = 401;
+            error.statusCode = 404;
             throw error;
         }
         let end = new Date(goal.endDate);

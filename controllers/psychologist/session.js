@@ -74,9 +74,10 @@ exports.getSessions = async (req, res, next) => {
         const psy = await Psy.findByPk(req.role.id);
         const sessions = await psy.getSessions();
         if(sessions.length <= 0){
-            const error = new Error('No sessions found');
-            error.statusCode = 404;
-            throw error;
+            res.status(204).json({
+                message: 'There are no sessions yet',
+                data: []
+            });  
         }
         res.status(201).json({data: {entries: sessions}});
     } catch (err) {
@@ -95,9 +96,10 @@ exports.getSessionsToday = async (req, res, next) => {
             }
         });
         if(sessions.length <= 0){
-            const error = new Error('No sessions found');
-            error.statusCode = 404;
-            throw error;
+            res.status(204).json({
+                message: 'There are no sessions yet',
+                data: []
+            });  
         }
         res.status(201).json({data: {entries: sessions}});
     } catch (err) {
@@ -116,6 +118,7 @@ exports.getSession = async (req, res, next) => {
             error.statusCode = 404;
             throw error;
         }
+        console.log(session);
         const questionLists = await session.getQuestionLists();
         const notes = await Note.findAll({ 
             where: {
@@ -146,9 +149,10 @@ exports.getSession = async (req, res, next) => {
                 }
             });
             if(answer) {
-                answers.push(answer);
+                answers.push(answer)
             }
         });
+        console.log('testingtestingtestingtestingtestingtestintestintesting');
         const client = await Client.findByPk(session.clientId);
         const lastAnsweredAnswer = await EvaluationAnswer.findAll({
             limit: 1,
@@ -158,34 +162,37 @@ exports.getSession = async (req, res, next) => {
             order: [ [ 'createdAt', 'DESC' ]]
 
         });
-        const lastRatedSession = await Session.findOne({
-            where: {
-                id: lastAnsweredAnswer[0].sessionId,
-            },
-        });
-        console.log(session);
+        let answer = null
+        if(lastAnsweredAnswer.length > 0) {
+            const lastRatedSession = await Session.findOne({
+                where: {
+                    id: lastAnsweredAnswer[0].sessionId,
+                },
+            });
+            
+            const questionList = await lastRatedSession.getQuestionLists({
+                limit: 1, 
+                where: {
+                    title: 'Session rating'
+                },
+                order: [ [ 'createdAt', 'DESC' ]]
+            });
+            
+            const question = await EvaluationQuestion.findOne({
+                where: {
+                    questionListId: questionList[0].id,
+                    question: 'Algemene Beoordeeling'
+                },
+            });
+            
+            answer = await EvaluationAnswer.findOne({
+                where: {
+                    sessionId: lastRatedSession.id,
+                    evaluationQuestionId: question.id
+                }
+            });
+        }
         
-        const questionList = await lastRatedSession.getQuestionLists({
-            limit: 1, 
-            where: {
-                title: 'Session rating'
-            },
-            order: [ [ 'createdAt', 'DESC' ]]
-        });
-        
-        const question = await EvaluationQuestion.findOne({
-            where: {
-                questionListId: questionList[0].id,
-                question: 'Algemene Beoordeeling'
-            },
-        });
-        
-        const answer = await EvaluationAnswer.findOne({
-            where: {
-                sessionId: lastRatedSession.id,
-                evaluationQuestionId: question.id
-            }
-        });
         console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!works!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         console.log(answer);
         let lastRating = null
@@ -211,7 +218,7 @@ exports.getSession = async (req, res, next) => {
                 name: contact.firstName + ' ' + contact.familyName,
                 entry: client,
                 lastSessionRating: lastRating,
-                lastMood: mood.mood
+                lastMood: mood ? mood.mood : null
             },
             notes: notes,
             questions: allQuestions,

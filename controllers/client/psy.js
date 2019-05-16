@@ -2,7 +2,9 @@ const Client = require('./../../models/client');
 const User = require('./../../models/user');
 const Psy = require('./../../models/psychologist');
 const Invite = require('./../../models/invite');
+const Contact = require('./../../models/contact');
 
+const aFE = require('./../../util/asyncForEach');
 
 exports.getInvites = async (req, res, next) => {
     try {
@@ -11,28 +13,45 @@ exports.getInvites = async (req, res, next) => {
         const invites = await Invite.findAll({
             where:{
                 clientEmail: user.email
-            }
+            },
+            raw: true
         })
         if(invites.length <= 0) {
-            const error = new Error('There are no new invites');
-            error.statusCode = 401;
-            throw error;
+            res.status(204).json({
+                message: 'There are no invites',
+                data: []
+            });  
         }
-        res.status(200).json({
-            data: invites
+        aFE.asyncForEach(invites, async invite => {
+            const psy = await Psy.findByPk(invite.psychologistId, {
+                raw: true,
+            });
+            console.log(psy); 
+            const contact = await Contact.findOne({
+                where: {
+                    userId: psy.userId
+                }
+            });
+            psy.contact = contact
+            invite.psy = psy;
+            if(invite.id === invites[invites.length -1].id) {
+                res.status(200).json({
+                    data: invites
+                })
+            }
         })
-
     } catch (err) {
         if (!err.statusCode) {
             err.statusCode = 500;
             }
         next(err); 
     }
-    
 }
 exports.getPsy = async (req, res, next) => {
     try {
         //TODO
+        const client = await Client.findByPk(req.role.id);
+        const test = await client.getPsychologists();
     } catch (err) {
         if (!err.statusCode) {
             err.statusCode = 500;
@@ -45,14 +64,13 @@ exports.answerInvite = async (req, res, next) => {
         const invite = await Invite.findByPk(req.body.inviteId);
         if(!invite) {
             const error = new Error('Invite with id: ' + req.body.inviteId + ' has not been found');
-            error.statusCode = 401;
+            error.statusCode = 404;
             throw error;
         }
         const client = await Client.findByPk(req.role.id);
         const psy = await Psy.findByPk(invite.psychologistId);
         if(req.body.approved){
             await client.addPsychologist(psy);
-            const test = await client.getPsychologists();
         }
         await invite.destroy();
         res.status(200).json({

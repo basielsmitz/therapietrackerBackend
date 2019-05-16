@@ -60,6 +60,15 @@ exports.getClients = async (req, res, next) => {
         }
         const clientsPlus = [];
         await aFE.asyncForEach(clients, async (client) => {
+            const contact = await Contact.findOne({
+                where: {
+                    userId: client.userId
+                }
+            });
+            console.log(contact);
+            //console.log(client);
+            client.name = contact.firstName + ' ' + contact.familyName;
+
             const mood = await Mood.findOne({
                 where: {
                     clientId: client.id
@@ -80,7 +89,12 @@ exports.getClients = async (req, res, next) => {
                 order: [ [ 'createdAt', 'DESC' ]]
 
             });
-            console.log(lastAnsweredAnswer);
+            if(lastAnsweredAnswer.length <= 0) {
+                console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!true');
+                clientsPlus.push(client);
+            } else {
+                console.log('ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffalse');
+                console.log(lastAnsweredAnswer);
 
             const session = await Session.findOne({
                 where: {
@@ -120,12 +134,6 @@ exports.getClients = async (req, res, next) => {
             } else {
                 client.score = null;
             }
-            const contact = await Contact.findOne({
-                where: {
-                    userId: client.userId
-                }
-            });
-            client.name = contact.firstName + ' ' + contact.familyName;
             if(session) {
                 client.session = session;
             }
@@ -133,9 +141,18 @@ exports.getClients = async (req, res, next) => {
                 client.session = null;
             }
 
+            const contact = await Contact.findOne({
+                where: {
+                    userId: client.userId
+                }
+            });
+            client.name = contact.firstName + ' ' + contact.familyName;
             clientsPlus.push(client);
+            }
+            if(client.id === clients[clients.length -1].id) {
+                res.status(200).json({data: clientsPlus});
+            }
         })
-        res.status(200).json({data: clientsPlus});
     } catch (err) {
         if (!err.statusCode) {
             err.statusCode = 500;
@@ -477,3 +494,46 @@ exports.updateClient = async (req, res, next) => {
     }
 }
 
+exports.getClientContact = async (req, res, next) => {
+    try {
+        const psy = await Psy.findByPk(req.role.id); 
+        console.log('logggggggggggginglogggggggggggginglogggggggggggginglogggggggggggging');
+        console.log('logggggggggggginglogggggggggggginglogggggggggggginglogggggggggggging');
+        console.log('logggggggggggginglogggggggggggginglogggggggggggginglogggggggggggging');
+        console.log('logggggggggggginglogggggggggggginglogggggggggggginglogggggggggggging');
+        console.log('logggggggggggginglogggggggggggginglogggggggggggginglogggggggggggging');
+        console.log('logggggggggggginglogggggggggggginglogggggggggggginglogggggggggggging');
+        console.log('logggggggggggginglogggggggggggginglogggggggggggginglogggggggggggging');
+        const client = await psy.getClients({
+            where: {
+                id: req.params.clientId
+            }, 
+            raw: true        
+        })   
+        if(!client){
+            const error = new Error('There is no client with id:' + req.params.clientId);
+            error.statusCode = 404;
+            throw error;
+        }
+        const contact = await Contact.findOne({
+            where: {
+                userId: client[0].userId
+            }
+        });
+
+        const user = await User.findByPk(client[0].userId, {
+            attributes: ['id', 'email'],
+
+        })
+        client[0].contact = contact;
+        client[0].user = user;
+        res.status(200).json({
+            data: client[0],
+        });
+    } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+            }
+        next(err); 
+    }
+}
