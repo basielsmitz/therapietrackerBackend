@@ -1,5 +1,5 @@
 const express = require('express');
-require('dotenv').config();
+// require('dotenv').config();
 const bodyParser = require('body-parser');
 const sequelize = require('./util/database');
 const aFE = require('./util/asyncForEach');
