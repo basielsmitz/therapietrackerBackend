@@ -117,6 +117,11 @@ Todo.belongsTo(Psy);
 User.hasOne(Contact);
 Contact.belongsTo(User);
 
+app.use((req, res, next) => {
+    res.render('running');
+    next();
+})
+
 //errorhandler
 app.use((error, req, res, next) => {
     console.log(error)
@@ -244,30 +249,30 @@ const startingData = async () => {
         }
     ]
         //add emotions to db
-        await aFE.asyncForEach(emotions, async (emotion) => {
-            const dbEmotion = await Emotion.findOne({
-                where: emotion
-            });
-            if(!dbEmotion) {
-                await Emotion.create(emotion);
-            } else {
-                console.log('emotionExists');
-            }
-        })
+        // await aFE.asyncForEach(emotions, async (emotion) => {
+        //     const dbEmotion = await Emotion.findOne({
+        //         where: emotion
+        //     });
+        //     if(!dbEmotion) {
+        //         await Emotion.create(emotion);
+        //     } else {
+        //         console.log('emotionExists');
+        //     }
+        // })
     
-        //add questions to db
-        await aFE.asyncForEach(moodQuestions, async (question) => {
-            await MoodQuestion.create(question);
-        })
-        await aFE.asyncForEach(moodQuestions, async (question) => {
-            const dbQuestion = await MoodQuestion.findOne({
-                where: question
-            });
-            console.log('ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddbquestion')
-            if(!dbQuestion) {
-                await MoodQuestion.create(question);
-            } else {
-                console.log('questionExists');
-            }
-        })
+        // //add questions to db
+        // await aFE.asyncForEach(moodQuestions, async (question) => {
+        //     await MoodQuestion.create(question);
+        // })
+        // await aFE.asyncForEach(moodQuestions, async (question) => {
+        //     const dbQuestion = await MoodQuestion.findOne({
+        //         where: question
+        //     });
+        //     console.log('ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddbquestion')
+        //     if(!dbQuestion) {
+        //         await MoodQuestion.create(question);
+        //     } else {
+        //         console.log('questionExists');
+        //     }
+        // })
 }
